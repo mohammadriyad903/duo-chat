@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
+  AuthForm(this.submitFn, this.isLoading);
+
+  final bool isLoading;
+  final void Function(
+    String email,
+    String password,
+    String username,
+    bool isLogin,
+    BuildContext ctx
+  ) submitFn;
+
   @override
   State<AuthForm> createState() => _AuthFormState();
 }
@@ -18,6 +29,13 @@ class _AuthFormState extends State<AuthForm> {
 
     if (isValid) {
       _formkey.currentState!.save();
+      widget.submitFn(
+        _userEmail.trim(),
+        _userPassword.trim(),
+        _userName.trim(),
+        _isLogin,
+        context
+      );
     }
   }
 
@@ -34,25 +52,25 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if(!_isLogin)
-                  TextFormField(
-                    key: ValueKey("username"),
-                    onSaved: (newValue) {
-                      _userName = newValue!;
-                    },
-                    validator: (value) {
-                      if (value!.isEmpty || value.length < 4) {
-                        return "Please enter at least 4 Characters";
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.name,
-                    decoration: const InputDecoration(
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFFFE3B84))),
-                        labelText: "Enter User Name",
-                        labelStyle: TextStyle(color: Color(0xFFFE3B84))),
-                  ),
+                  if (!_isLogin)
+                    TextFormField(
+                      key: ValueKey("username"),
+                      onSaved: (newValue) {
+                        _userName = newValue!;
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty || value.length < 4) {
+                          return "Please enter at least 4 Characters";
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.name,
+                      decoration: const InputDecoration(
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFFE3B84))),
+                          labelText: "Enter User Name",
+                          labelStyle: TextStyle(color: Color(0xFFFE3B84))),
+                    ),
                   TextFormField(
                     key: ValueKey("email"),
                     onSaved: (newValue) {
@@ -92,6 +110,10 @@ class _AuthFormState extends State<AuthForm> {
                   const SizedBox(
                     height: 20,
                   ),
+
+                  if(widget.isLoading)
+                  CircularProgressIndicator(),
+                  if(!widget.isLoading)
                   ElevatedButton(
                     onPressed: _trySubmit,
                     style: ElevatedButton.styleFrom(
@@ -101,20 +123,23 @@ class _AuthFormState extends State<AuthForm> {
                       shape: StadiumBorder(),
                     ),
                     child: Text(
-                      _isLogin ?  "Log In" : "Signup",
+                      _isLogin ? "Log In" : "Signup",
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
                   ),
+                  if(!widget.isLoading)
                   TextButton(
                       onPressed: () {
                         setState(() {
                           _isLogin = !_isLogin;
                         });
                       },
-                      child:  Text(
-                        _isLogin ?  "Create new account" : 'I already have an Account ',
+                      child: Text(
+                        _isLogin
+                            ? "Create new account"
+                            : 'I already have an Account ',
                         style: TextStyle(color: Color(0xFFFE3B84)),
                       )),
                 ],

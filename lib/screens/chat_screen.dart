@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:duo/widgets/chat/messages.dart';
+import 'package:duo/widgets/chat/new_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -6,38 +9,55 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            appBar: AppBar(
-              title: Text("@UserName"),
-            ),
-            body: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('chats/m9odWkXJoIjjq6BJv3CA/messgaes')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                final documents = snapshot.data!.docs;
-                return ListView.builder(
-                  itemCount: documents.length,
-                  itemBuilder: (context, index) => Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(documents[index]["text"]),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Text("DUO"),
+        actions: [
+          DropdownButton(
+            items: [
+              DropdownMenuItem(
+                child: Container(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.exit_to_app,
+                        color: Colors.black,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+                value: 'logout',
+              ),
+            ],
+            icon: Icon(
+              Icons.more_vert,
+              color: Colors.white,
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                FirebaseFirestore.instance
-                    .collection('chats/m9odWkXJoIjjq6BJv3CA/messgaes')
-                    .add({
-                      'text' : 'This data add by using float button.'
-                    });
-              },
-              child: Icon(Icons.add),
-            )));
+            onChanged: (itemIdentifier) {
+              if (itemIdentifier == 'logout') {
+                FirebaseAuth.instance.signOut();
+              }
+            },
+          )
+        ],
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Expanded(
+              child: Messages(),
+            ),
+            NewMessage(),
+          ],
+        ),
+      ),
+    ));
   }
 }
