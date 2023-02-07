@@ -1,3 +1,4 @@
+import 'package:duo/widgets/pickers/user_image_picker.dart';
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
@@ -52,6 +53,7 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  UserImagePicker(),
                   if (!_isLogin)
                     TextFormField(
                       key: ValueKey("username"),
@@ -67,9 +69,9 @@ class _AuthFormState extends State<AuthForm> {
                       keyboardType: TextInputType.name,
                       decoration: const InputDecoration(
                           focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFFE3B84))),
+                              borderSide: BorderSide(color: Color(0xff101C5A))),
                           labelText: "Enter User Name",
-                          labelStyle: TextStyle(color: Color(0xFFFE3B84))),
+                          labelStyle: TextStyle(color: Color(0xff101C5A))),
                     ),
                   TextFormField(
                     key: ValueKey("email"),
@@ -85,9 +87,9 @@ class _AuthFormState extends State<AuthForm> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                         focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFFFE3B84))),
+                            borderSide: BorderSide(color: Color(0xff101C5A))),
                         labelText: "Enter an email",
-                        labelStyle: TextStyle(color: Color(0xFFFE3B84))),
+                        labelStyle: TextStyle(color: Color(0xff101C5A))),
                   ),
                   TextFormField(
                     key: ValueKey("password"),
@@ -102,9 +104,9 @@ class _AuthFormState extends State<AuthForm> {
                     },
                     decoration: const InputDecoration(
                         focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFFFE3B84))),
+                            borderSide: BorderSide(color: Color(0xff101C5A))),
                         labelText: "Enter a password",
-                        labelStyle: TextStyle(color: Color(0xFFFE3B84))),
+                        labelStyle: TextStyle(color: Color(0xff101C5A))),
                     obscureText: true,
                   ),
                   const SizedBox(
@@ -119,7 +121,7 @@ class _AuthFormState extends State<AuthForm> {
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
                           horizontal: 25.0, vertical: 10.0),
-                      backgroundColor: Color(0xFFFE3B84),
+                      backgroundColor: Color(0xff101C5A),
                       shape: StadiumBorder(),
                     ),
                     child: Text(
@@ -140,7 +142,7 @@ class _AuthFormState extends State<AuthForm> {
                         _isLogin
                             ? "Create new account"
                             : 'I already have an Account ',
-                        style: TextStyle(color: Color(0xFFFE3B84)),
+                        style: TextStyle(color: Color(0xff101C5A)),
                       )),
                 ],
               ),
