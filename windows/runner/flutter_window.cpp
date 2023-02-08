@@ -17,6 +17,7 @@ bool FlutterWindow::OnCreate() {
   RECT frame = GetClientArea();
 
   // The size here must match the window dimensions to avoid unnecessary surface
+  // this is a c++ file
   // creation / destruction in the startup path.
   flutter_controller_ = std::make_unique<flutter::FlutterViewController>(
       frame.right - frame.left, frame.bottom - frame.top, project_);
