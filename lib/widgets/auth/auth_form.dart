@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:duo/widgets/pickers/user_image_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -5,40 +7,52 @@ class AuthForm extends StatefulWidget {
   AuthForm(this.submitFn, this.isLoading);
 
   final bool isLoading;
-  final void Function(
-    String email,
-    String password,
-    String username,
-    bool isLogin,
-    BuildContext ctx
-  ) submitFn;
+  final void Function(String email, String password, String username, File? image,
+      bool isLogin, BuildContext ctx) submitFn;
 
   @override
   State<AuthForm> createState() => _AuthFormState();
 }
 
 class _AuthFormState extends State<AuthForm> {
-  final _formkey = GlobalKey<FormState>();
-  bool _isLogin = true;
-  String _userEmail = "";
-  String _userName = "";
-  String _userPassword = "";
+  final _formKey = GlobalKey<FormState>();
+  var _isLogin = true;
+  var _userEmail = '';
+  var _userName = '';
+  var _userPassword = '';
+  File? _userImageFile;
+
+  void _pickedImage(File image) {
+    _userImageFile = image;
+  }
 
   void _trySubmit() {
-    final isValid = _formkey.currentState!.validate();
+    final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
+    if (_userImageFile == null && !_isLogin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please pick an image.'),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+      return;
+    }
+
     if (isValid) {
-      _formkey.currentState!.save();
+      _formKey.currentState!.save();
       widget.submitFn(
         _userEmail.trim(),
         _userPassword.trim(),
         _userName.trim(),
+        _userImageFile,
         _isLogin,
-        context
+        context,
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +63,11 @@ class _AuthFormState extends State<AuthForm> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
-              key: _formkey,
+              key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  UserImagePicker(),
+                  if (!_isLogin) UserImagePicker(_pickedImage),
                   if (!_isLogin)
                     TextFormField(
                       key: ValueKey("username"),
@@ -112,38 +126,36 @@ class _AuthFormState extends State<AuthForm> {
                   const SizedBox(
                     height: 20,
                   ),
-
-                  if(widget.isLoading)
-                  CircularProgressIndicator(),
-                  if(!widget.isLoading)
-                  ElevatedButton(
-                    onPressed: _trySubmit,
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 25.0, vertical: 10.0),
-                      backgroundColor: Color(0xff101C5A),
-                      shape: StadiumBorder(),
-                    ),
-                    child: Text(
-                      _isLogin ? "Log In" : "Signup",
-                      style: TextStyle(
-                        color: Colors.white,
+                  if (widget.isLoading) CircularProgressIndicator(),
+                  if (!widget.isLoading)
+                    ElevatedButton(
+                      onPressed: _trySubmit,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 25.0, vertical: 10.0),
+                        backgroundColor: Color(0xff101C5A),
+                        shape: StadiumBorder(),
+                      ),
+                      child: Text(
+                        _isLogin ? "Log In" : "Signup",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                  if(!widget.isLoading)
-                  TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isLogin = !_isLogin;
-                        });
-                      },
-                      child: Text(
-                        _isLogin
-                            ? "Create new account"
-                            : 'I already have an Account ',
-                        style: TextStyle(color: Color(0xff101C5A)),
-                      )),
+                  if (!widget.isLoading)
+                    TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _isLogin = !_isLogin;
+                          });
+                        },
+                        child: Text(
+                          _isLogin
+                              ? "Create new account"
+                              : 'I already have an Account ',
+                          style: TextStyle(color: Color(0xff101C5A)),
+                        )),
                 ],
               ),
             ),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duo/widgets/auth/auth_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,13 +16,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   var _isLoading = false;
 
-  void _submitAuthForm(
-    String email,
-    String password,
-    String username,
-    bool isLogin,
-    BuildContext ctx
-  ) async {
+  void _submitAuthForm(String email, String password, String username,
+      File? image, bool isLogin, BuildContext ctx) async {
     UserCredential authResult;
 
     try {
@@ -33,16 +31,21 @@ class _AuthScreenState extends State<AuthScreen> {
         authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
+        final firebase_storage.FirebaseStorage storage =
+            firebase_storage.FirebaseStorage.instance;
+        await storage
+            .ref('user_images/${authResult.user!.uid}.jpg')
+            .putFile(image!);
+        final url = await storage.ref('user_images/${authResult.user!.uid}.jpg').getDownloadURL();
         await FirebaseFirestore.instance
             .collection('users')
             .doc(authResult.user!.uid)
-            .set({"username": username, "email": email});
+            .set({"username": username, "email": email, 'image_url' : url});
       }
     } on PlatformException catch (err) {
       var message = "An error occurred, please check your credential!";
 
       if (err.message != null) {
-
         message = err.message!;
       }
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
